@@ -1,33 +1,74 @@
-﻿using Modelo;
+﻿using Microsoft.EntityFrameworkCore;
+using Modelo;
 namespace Controlador
 {
     public class TareaControler
     {
-        private readonly Modelo.AppContext _context;
+        private static TareaControler _instancia;
+        private static readonly object _Lock = new Object();
 
-        public TareaControler()
+        private TareaControler()
         {
-            _context = new Modelo.AppContext();
+        }
+        public static TareaControler Instance
+        {
+            get
+            {
+                lock (_Lock)
+                {
+                    if (_instancia == null)
+                    {
+                        _instancia = new TareaControler();
+                    }
+                    return _instancia;
+                }
+            }
         }
 
         public List<Tarea> ObtenerTareas()
         {
-            return new List<Tarea>();
+            using (var contexto = new Modelo.AppContext())
+            {
+                return contexto.Tarea.ToList();
+            }
         }
-        public void AgregarTarea(Tarea tarea) 
+        public Tarea BuscarTarea(int Id)
         {
-            _context.Add(tarea);
-            _context.SaveChanges();
+            using (var contexto = new Modelo.AppContext())
+            {
+                return contexto.Tarea.First(tarea => tarea.Id == Id);
+            }
         }
-        public void ModificarTarea(Tarea tarea) 
+        public void AgregarTarea(Tarea tarea)
         {
-            _context.Update(tarea);
-            _context.SaveChanges();
+            using (var contexto = new Modelo.AppContext())
+            {
+
+                contexto.Tarea.Add(tarea);
+                contexto.SaveChanges();
+            }
         }
-        public void EliminarTarea(Tarea tarea) 
+        public void ModificarTarea(Tarea tarea)
         {
-            _context.Remove(tarea);
-            _context.SaveChanges();
+            using (var contexto = new Modelo.AppContext())
+            {
+
+                contexto.Tarea.Update(tarea);
+                contexto.SaveChanges();
+            }
+        }
+        public void EliminarTarea(Tarea tarea)
+        {
+            using (var contexto = new Modelo.AppContext())
+            {
+                var tareaSeleccionada = BuscarTarea(tarea.Id);
+                if (tareaSeleccionada != null)
+                {
+                    contexto.Tarea.Remove(tareaSeleccionada);
+                    contexto.SaveChanges();
+                }
+            }
         }
     }
 }
+

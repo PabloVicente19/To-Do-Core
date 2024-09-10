@@ -9,12 +9,11 @@ namespace Modelo
 {
     public class AppContext : DbContext
     {
-        private DbSet<Tarea> Tareas {  get; set; }
+        public DbSet<Tarea> Tarea { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=");
-            //optionsBuilder.UseSqlite("Data Source=todo.db");
+            optionsBuilder.UseSqlServer("Data Source=.\\SQLEXPRESS;Initial Catalog=ToDoApp;Integrated Security=True;Trust Server Certificate=True");
         }
     }
 }
